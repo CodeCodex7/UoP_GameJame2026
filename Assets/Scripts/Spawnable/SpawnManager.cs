@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class SpawnManager : MonoBehaviour
+public class SpawnManager : MonoService<SpawnManager>
 {
     public List<SpawnableBuilding> SpawnableBuildings;
 
