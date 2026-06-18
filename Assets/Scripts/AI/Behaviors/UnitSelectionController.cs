@@ -77,6 +77,12 @@ namespace AI.Goap.UnitAI.Behaviors
             var unit = hit.collider.GetComponentInParent<IUnit>();
             var selectable = unit as ISelectable ?? hit.collider.GetComponentInParent<ISelectable>();
 
+            if (SelectedUnit != null && unit != null && SelectedUnit != unit && CanIssueAttackOrder(SelectedUnit, unit))
+            {
+                SelectedUnit.AttackOrder(unit);
+                return;
+            }
+
             if (selectable == null)
             {
                 if (deselectWhenClickingEmpty)
@@ -104,6 +110,23 @@ namespace AI.Goap.UnitAI.Behaviors
             }
 
             Select(selectable);
+        }
+
+        private static bool CanIssueAttackOrder(IUnit attacker, IUnit target)
+        {
+            if (attacker == null || target == null || !attacker.IsAlive || !target.IsAlive)
+            {
+                return false;
+            }
+
+            if (attacker is ITeam attackerTeam &&
+                target is ITeam targetTeam &&
+                string.Equals(attackerTeam.TeamId, targetTeam.TeamId, System.StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

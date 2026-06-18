@@ -10,9 +10,11 @@ namespace AI.Goap.UnitAI.Behaviors
 
         private readonly HashSet<IResource> resources = new HashSet<IResource>();
         private readonly HashSet<IStorageBuilding> storageBuildings = new HashSet<IStorageBuilding>();
+        private readonly HashSet<IUnit> units = new HashSet<IUnit>();
 
         public IReadOnlyCollection<IResource> Resources => resources;
         public IReadOnlyCollection<IStorageBuilding> StorageBuildings => storageBuildings;
+        public IReadOnlyCollection<IUnit> Units => units;
 
         private void Awake()
         {
@@ -75,6 +77,26 @@ namespace AI.Goap.UnitAI.Behaviors
             }
 
             storageBuildings.Remove(storageBuilding);
+        }
+
+        public void RegisterUnit(IUnit unit)
+        {
+            if (unit == null)
+            {
+                return;
+            }
+
+            units.Add(unit);
+        }
+
+        public void UnregisterUnit(IUnit unit)
+        {
+            if (unit == null)
+            {
+                return;
+            }
+
+            units.Remove(unit);
         }
 
         public int GetStoredAmount(ResourceTypes resourceType)
@@ -209,6 +231,47 @@ namespace AI.Goap.UnitAI.Behaviors
             }
 
             return closestStorage != null;
+        }
+
+        public bool TryGetClosestRivalUnit(IUnit attacker, float radius, out IUnit closestRivalUnit)
+        {
+            closestRivalUnit = null;
+
+            if (attacker == null || attacker.Transform == null)
+            {
+                return false;
+            }
+
+            var attackerTeam = attacker as ITeam;
+            var closestDistanceSqr = radius * radius;
+            var position = attacker.Transform.position;
+
+            foreach (var unit in units)
+            {
+                if (unit == null || unit == attacker || !unit.IsAlive || unit.Transform == null)
+                {
+                    continue;
+                }
+
+                if (attackerTeam != null &&
+                    unit is ITeam unitTeam &&
+                    string.Equals(attackerTeam.TeamId, unitTeam.TeamId, System.StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                var distanceSqr = (unit.Transform.position - position).sqrMagnitude;
+
+                if (distanceSqr > closestDistanceSqr)
+                {
+                    continue;
+                }
+
+                closestDistanceSqr = distanceSqr;
+                closestRivalUnit = unit;
+            }
+
+            return closestRivalUnit != null;
         }
     }
 }
