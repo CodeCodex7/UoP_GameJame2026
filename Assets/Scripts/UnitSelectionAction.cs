@@ -2,6 +2,7 @@ using AI.Goap.UnitAI.Behaviors;
 using UnityEngine;
 using UnityEngine.Events;
 
+[SelectionBase]
 public class UnitSelectionAction : MonoBehaviour, ISelectable, IUnitSelectionListener
 {
     [SerializeField] private GameObject contextSource;
