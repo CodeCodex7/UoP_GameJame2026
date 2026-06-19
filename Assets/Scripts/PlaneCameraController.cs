@@ -9,6 +9,9 @@ public class PlaneCameraController : MonoBehaviour
     [SerializeField] private float zoomSpeed = 30f;
     [SerializeField] private float minZoomHeight = 6f;
     [SerializeField] private float maxZoomHeight = 40f;
+    [SerializeField] private bool useBounds = true;
+    [SerializeField] private Vector2 xBounds = new Vector2(-50f, 50f);
+    [SerializeField] private Vector2 zBounds = new Vector2(-50f, 50f);
 
     private float targetYaw;
 
@@ -23,6 +26,7 @@ public class PlaneCameraController : MonoBehaviour
         HandleZoom();
         HandleRotationInput();
         RotateTowardsTarget();
+        ClampToBounds();
     }
 
     private void HandleMovement()
@@ -77,6 +81,20 @@ public class PlaneCameraController : MonoBehaviour
         var nextPosition = transform.position + transform.forward * (scroll * zoomSpeed * Time.deltaTime);
         nextPosition.y = Mathf.Clamp(nextPosition.y, minZoomHeight, maxZoomHeight);
         transform.position = nextPosition;
+    }
+
+    private void ClampToBounds()
+    {
+        var position = transform.position;
+        position.y = Mathf.Clamp(position.y, minZoomHeight, maxZoomHeight);
+
+        if (useBounds)
+        {
+            position.x = Mathf.Clamp(position.x, xBounds.x, xBounds.y);
+            position.z = Mathf.Clamp(position.z, zBounds.x, zBounds.y);
+        }
+
+        transform.position = position;
     }
 
     private void RotateTowardsTarget()
