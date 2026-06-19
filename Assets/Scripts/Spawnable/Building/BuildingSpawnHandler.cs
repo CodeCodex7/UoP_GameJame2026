@@ -27,8 +27,9 @@ public class BuildingSpawnHandler : BaseSpawnHandler
     private Spawnable m_currentSelection;
     private int m_groundLayer;
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
         m_groundLayer = LayerMask.NameToLayer("Ground");
     }
 
