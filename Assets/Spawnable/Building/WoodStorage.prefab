@@ -363,8 +363,10 @@ MonoBehaviour:
   Cost:
     metal: 0
     wood: 0
-    mushrooms: 0
+    mushrooms: 1000
   UIImage: {fileID: 0}
+  Description: Stores wood
+  DisplayName: Wood Storage
 --- !u!114 &4163321628041765886
 MonoBehaviour:
   m_ObjectHideFlags: 0

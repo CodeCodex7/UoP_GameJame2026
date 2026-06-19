@@ -319,7 +319,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3822830812298447065}
-  - component: {fileID: 6246789102466292029}
+  - component: {fileID: 6718301223149684750}
   - component: {fileID: 4297005206477647872}
   - component: {fileID: 246402838244870931}
   - component: {fileID: 5082760829921966698}
@@ -347,7 +347,7 @@ Transform:
   - {fileID: 4015786077301098635}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6246789102466292029
+--- !u!114 &6718301223149684750
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -356,14 +356,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 8658720606149679173}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0071287f15bc4a279c646b27ccdc9baa, type: 3}
+  m_Script: {fileID: 11500000, guid: 52ed4ed0901552f4eb0d7986002932c0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SpawnableBuilding
+  m_EditorClassIdentifier: Assembly-CSharp::SpawnableBarracks
   Cost:
-    metal: 0
-    wood: 0
-    mushrooms: 0
+    metal: 100
+    wood: 69
+    mushrooms: 2
   UIImage: {fileID: 0}
+  Description: This building allows you to build more units
+  DisplayName: Barracks
 --- !u!114 &4297005206477647872
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -418,7 +420,19 @@ MonoBehaviour:
   hideUIScreenKey: 
   onSelected:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6718301223149684750}
+        m_TargetAssemblyTypeName: SpawnableBarracks, Assembly-CSharp
+        m_MethodName: OpenMenu
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   onDeselected:
     m_PersistentCalls:
       m_Calls: []

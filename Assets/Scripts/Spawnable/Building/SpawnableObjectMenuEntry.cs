@@ -1,20 +1,24 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class SpawnableObjectMenuEntry : MonoBehaviour
 {
-    private RawImage m_displayPicture;
-    private Text m_metalCost;
-    private Text m_woodCost;
-    private Text m_mushroomCost;
-    
-    
-    private Spawnable spawnable;
+    [SerializeField] private RawImage m_displayPicture;
+    [SerializeField] private TextMeshProUGUI m_metalCost;
+    [SerializeField] private TextMeshProUGUI m_woodCost;
+    [SerializeField] private TextMeshProUGUI m_mushroomCost;
 
-    public void Init(Spawnable spawnable)
+
+    private BuildingMenuUI m_parentUI;
+    public Spawnable Spawnable;
+
+    public void Init(BuildingMenuUI parentUI, Spawnable spawnable)
     {
-        this.spawnable = spawnable;
+        this.m_parentUI = parentUI;
+        this.Spawnable = spawnable;
 
         m_displayPicture.texture = spawnable.UIImage;
         m_metalCost.text = spawnable.Cost.metal.ToString();
@@ -22,4 +26,24 @@ public class SpawnableObjectMenuEntry : MonoBehaviour
         m_mushroomCost.text = spawnable.Cost.mushrooms.ToString();
         
     }
+
+
+    public void PointerOver(BaseEventData eventData)
+    {
+        m_parentUI.PointerOverEntry(this, eventData as PointerEventData);
+    }
+
+    public void PointerExit(BaseEventData eventData)
+    {
+        m_parentUI.PointerExitEntry(this, eventData as PointerEventData);
+
+    }
+    
+    public void PointerDown(BaseEventData eventData)
+    {
+        m_parentUI.PointerDown(this, eventData as PointerEventData);
+    }
+
+    
+    
 }

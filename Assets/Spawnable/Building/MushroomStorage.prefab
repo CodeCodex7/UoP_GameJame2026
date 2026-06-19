@@ -361,10 +361,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpawnableBuilding
   Cost:
-    metal: 0
-    wood: 0
-    mushrooms: 0
+    metal: 1000
+    wood: 5
+    mushrooms: 1
   UIImage: {fileID: 0}
+  Description: Stores mushrooms
+  DisplayName: Mushroom Storage
 --- !u!114 &4163321628041765886
 MonoBehaviour:
   m_ObjectHideFlags: 0
