@@ -1,9 +1,6 @@
+using AI.Goap.UnitAI.Behaviors;
 using CrashKonijn.Agent.Core;
 using CrashKonijn.Goap.Runtime;
-<<<<<<< HEAD
-using AI.Goap.UnitAI.Behaviors;
-=======
->>>>>>> origin/feature/CombatAI
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -14,11 +11,8 @@ namespace AI.Goap.UnitAI.Sensors
         private const float DefaultTargetRadius = 1.5f;
         private const float ExtraDistance = 1.25f;
         private const float NavMeshSampleRadius = 2f;
-<<<<<<< HEAD
         private const float OccupiedRadius = 1.25f;
         private const int CandidateCount = 16;
-=======
->>>>>>> origin/feature/CombatAI
 
         public static ITarget CreateAroundTarget(IActionReceiver agent, Transform target)
         {
@@ -40,21 +34,11 @@ namespace AI.Goap.UnitAI.Sensors
             direction.Normalize();
 
             var distance = GetTargetRadius(target) + ExtraDistance;
-<<<<<<< HEAD
             var desiredPosition = FindUnblockedPoint(agent, targetPosition, direction, distance);
-=======
-            var desiredPosition = targetPosition + direction * distance;
-
-            if (NavMesh.SamplePosition(desiredPosition, out var hit, NavMeshSampleRadius, NavMesh.AllAreas))
-            {
-                desiredPosition = hit.position;
-            }
->>>>>>> origin/feature/CombatAI
 
             return new PositionTarget(desiredPosition);
         }
 
-<<<<<<< HEAD
         private static Vector3 FindUnblockedPoint(IActionReceiver agent, Vector3 targetPosition, Vector3 preferredDirection, float distance)
         {
             var bestPosition = targetPosition + preferredDirection * distance;
@@ -123,8 +107,6 @@ namespace AI.Goap.UnitAI.Sensors
             return score;
         }
 
-=======
->>>>>>> origin/feature/CombatAI
         private static float GetTargetRadius(Transform target)
         {
             var colliders = target.GetComponentsInChildren<Collider>();
