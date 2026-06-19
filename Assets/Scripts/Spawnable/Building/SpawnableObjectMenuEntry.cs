@@ -1,9 +1,11 @@
-﻿using TMPro;
+﻿using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(Button))]
 public class SpawnableObjectMenuEntry : MonoBehaviour
 {
     [SerializeField] private RawImage m_displayPicture;
@@ -11,9 +13,18 @@ public class SpawnableObjectMenuEntry : MonoBehaviour
     [SerializeField] private TextMeshProUGUI m_woodCost;
     [SerializeField] private TextMeshProUGUI m_mushroomCost;
 
-
+    
     private BuildingMenuUI m_parentUI;
-    public Spawnable Spawnable;
+    [HideInInspector] public Spawnable Spawnable;
+
+    private CostChecker m_costChecker;
+    private Button m_button;
+    
+    private void Start()
+    {
+        m_button = GetComponent<Button>();
+        m_costChecker = Services.Resolve<CostChecker>();
+    }
 
     public void Init(BuildingMenuUI parentUI, Spawnable spawnable)
     {
@@ -27,6 +38,11 @@ public class SpawnableObjectMenuEntry : MonoBehaviour
         
     }
 
+
+    private void Update()
+    {
+        m_button.interactable = m_costChecker.HasFunds(Spawnable);
+    }
 
     public void PointerOver(BaseEventData eventData)
     {

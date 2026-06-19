@@ -7,10 +7,17 @@ public abstract class BaseSpawnHandler : MonoBehaviour
 {
     private Action m_handlerCompleteCallback;
     protected Spawnable m_currentSpawnable;
+    private CostChecker m_costChecker;
+
+
+    protected virtual void Start()
+    {
+        m_costChecker = Services.Resolve<CostChecker>();
+    }
 
     public void InitiateSpawnInteraction(Spawnable spawnable, Action onSpawnHandlerComplete)
     {
-        if (!HasFunds(spawnable))
+        if (!m_costChecker.HasFunds(spawnable))
             return;
         
         m_handlerCompleteCallback = onSpawnHandlerComplete;
@@ -20,15 +27,7 @@ public abstract class BaseSpawnHandler : MonoBehaviour
     }
 
 
-    private bool HasFunds(Spawnable spawnable)
-    {
-        return true;
-        var gameDataStore = Services.Resolve<GameDataStore>();
-        return
-            gameDataStore.GetStoredAmount(ResourceTypes.Metal) >= spawnable.Cost.metal &&
-            gameDataStore.GetStoredAmount(ResourceTypes.Wood) >= spawnable.Cost.wood &&
-            gameDataStore.GetStoredAmount(ResourceTypes.Mushrooms) >= spawnable.Cost.mushrooms;
-    }
+
 
     protected abstract void StartPlacement(Spawnable spawnable);
 
