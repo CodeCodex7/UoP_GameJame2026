@@ -30,13 +30,13 @@ namespace AI.Goap.UnitAI.Actions
         {
             data.DepositTimer = null;
             data.HasStartedDeposit = false;
-            data.Storage = GetStorage(data.Target);
+            data.Storage = GetStorage(data.Target, agent.transform);
         }
 
         public override bool IsValid(IActionReceiver agent, Data data)
         {
             var brain = agent.Transform.GetComponent<UnitAIBrain>();
-            return brain != null && brain.HasCarriedResource && GetStorage(data.Target) != null;
+            return brain != null && brain.HasCarriedResource && GetStorage(data.Target, agent.Transform) != null;
         }
 
         public override IActionRunState Perform(IMonoAgent agent, Data data, IActionContext context)
@@ -51,7 +51,7 @@ namespace AI.Goap.UnitAI.Actions
                 return ActionRunState.Stop;
             }
 
-            data.Storage ??= GetStorage(data.Target);
+            data.Storage ??= GetStorage(data.Target, agent.transform);
 
             if (data.Storage == null)
             {
@@ -93,14 +93,24 @@ namespace AI.Goap.UnitAI.Actions
             return ActionRunState.Completed;
         }
 
-        private static IStorageBuilding GetStorage(ITarget target)
+        private static IStorageBuilding GetStorage(ITarget target, Transform agentTransform)
         {
-            if (target is not TransformTarget transformTarget || transformTarget.Transform == null)
+            if (target is TransformTarget transformTarget && transformTarget.Transform != null)
+            {
+                return transformTarget.Transform.GetComponentInParent<IStorageBuilding>();
+            }
+
+            if (agentTransform == null ||
+                !agentTransform.TryGetComponent<UnitAIBrain>(out var brain) ||
+                brain.Inventory == null ||
+                !brain.Inventory.TryPeekFirst(out var carriedResource) ||
+                !Services.TryResolve<GameDataStore>(out var gameDataStore) ||
+                !gameDataStore.TryGetClosestStorageForResource(agentTransform.position, carriedResource, out var closestStorage))
             {
                 return null;
             }
 
-            return transformTarget.Transform.GetComponentInParent<IStorageBuilding>();
+            return closestStorage;
         }
     }
 }

@@ -13,6 +13,8 @@ namespace AI.Goap.UnitAI.Factories
             builder.AddCapability<IdleCapability>();
             builder.AddCapability<WanderCapability>();
             builder.AddCapability<MoveOrderCapability>();
+            builder.AddCapability<AttackOrderCapability>();
+            builder.AddCapability<HarvestOrderCapability>();
             builder.AddCapability<HarvestNearbyCapability>();
             builder.AddCapability<DepositResourceCapability>();
             

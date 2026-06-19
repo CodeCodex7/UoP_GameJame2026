@@ -1,4 +1,5 @@
-﻿﻿using System;
+﻿ ﻿using System;
+using System.Collections;
  using AI.Goap.UnitAI.Goal;
  using AI.Goap.UnitAI.Factories;
  using CrashKonijn.Goap.Runtime;
@@ -10,7 +11,7 @@ namespace AI.Goap.UnitAI.Behaviors
     
     
     public enum OrderType{ Move,Action,Wait,Die}
-    public enum UnitType {Worker,Fighter,Civilain}
+    public enum UnitType {Worker,Fighter,Civilain,Mayor}
     [RequireComponent(typeof(GoapActionProvider))]
     [RequireComponent(typeof(UnitInventory))]
     public class UnitAIBrain : MonoBehaviour, IUnit, ITeam
@@ -48,6 +49,7 @@ namespace AI.Goap.UnitAI.Behaviors
         [SerializeField] private int currentHp;
         [SerializeField] private bool disableOnDeath;
         [SerializeField] private bool deleteOnDeath = true;
+        [SerializeField] private float deathDelay = 0.3f;
         
         [SerializeField] private UnityEvent onDeath;
         [SerializeField] private float attackSearchRadius = 15f;
@@ -61,6 +63,7 @@ namespace AI.Goap.UnitAI.Behaviors
         private Color[][] originalColors;
         private float idleTimer;
         private bool hasRequestedAutoHarvest;
+        private bool isDying;
         private IResource gatherOrderTarget;
         private IUnit attackOrderTarget;
 
@@ -71,14 +74,10 @@ namespace AI.Goap.UnitAI.Behaviors
         {
             this.provider = this.GetComponent<GoapActionProvider>();
             agentTargetMove = this.GetComponent<AgentTargetMove>();
-            inventory = GetComponent<UnitInventory>();
-            currentHp = maxHp;
+            behaviour = FindAnyObjectByType<GoapBehaviour>();
             
-            if (inventory == null)
-            {
-                inventory = gameObject.AddComponent<UnitInventory>();
-            }
-
+            inventory = GetComponent<UnitInventory>();
+            
             switch (Unittype)
             {
                 case UnitType.Worker:
@@ -98,10 +97,23 @@ namespace AI.Goap.UnitAI.Behaviors
                     CreateAgent("Fighter");
                 }
                     break;
+
+                case UnitType.Mayor:
+                {
+                    CreateAgent("Mayor");
+                }
+                    break;
                 
                 default:
-                        CreateAgent("IdleAgent");
+                    CreateAgent("IdleAgent");
                     break;
+            }
+            
+            currentHp = maxHp;
+            
+            if (inventory == null)
+            {
+                inventory = gameObject.AddComponent<UnitInventory>();
             }
             
             CacheRendererColors();
@@ -148,6 +160,12 @@ namespace AI.Goap.UnitAI.Behaviors
                 case UnitType.Fighter:
                 {
                     provider.RequestGoal<AttackRivalUnitGoal>(true);
+                }
+                    break;
+
+                case UnitType.Mayor:
+                {
+                    provider.RequestGoal<IdleGoal>(true);
                 }
                     break;
                 
@@ -203,7 +221,7 @@ namespace AI.Goap.UnitAI.Behaviors
 
         public void GatherOrder(IResource resource)
         {
-            if (Unittype != UnitType.Worker || resource == null || resource.IsDepleted)
+            if (!CanGatherResources() || resource == null || resource.IsDepleted)
             {
                 return;
             }
@@ -226,13 +244,18 @@ namespace AI.Goap.UnitAI.Behaviors
             }
             else
             {
-                provider.RequestGoal<HarvestNearestGoal>(true);
+                provider.RequestGoal<HarvestOrderGoal>(true);
             }
 
             if (hadAction)
             {
                 provider.ResolveAction();
             }
+        }
+
+        private bool CanGatherResources()
+        {
+            return Unittype == UnitType.Worker || Unittype == UnitType.Mayor;
         }
 
         public void AttackOrder(IUnit targetUnit)
@@ -360,7 +383,7 @@ namespace AI.Goap.UnitAI.Behaviors
 
             if (currentHp <= 0)
             {
-                Die();
+                BeginDeath();
             }
         }
 
@@ -372,6 +395,30 @@ namespace AI.Goap.UnitAI.Behaviors
             }
 
             currentHp = Mathf.Min(maxHp, currentHp + amount);
+        }
+
+        private void BeginDeath()
+        {
+            if (isDying)
+            {
+                return;
+            }
+
+            isDying = true;
+
+            if (deathDelay <= 0f)
+            {
+                Die();
+                return;
+            }
+
+            StartCoroutine(DieAfterDelay());
+        }
+
+        private IEnumerator DieAfterDelay()
+        {
+            yield return new WaitForSeconds(deathDelay);
+            Die();
         }
 
         private void Die()
@@ -439,7 +486,7 @@ namespace AI.Goap.UnitAI.Behaviors
                 return;
             }
 
-            provider.RequestGoal<HarvestNearestGoal>(true);
+            provider.RequestGoal<HarvestOrderGoal>(true);
         }
 
         public void CompleteGatherOrder()

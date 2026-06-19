@@ -21,7 +21,7 @@ namespace AI.Goap.UnitAI.Capabilitys
 
             builder.AddAction<HarvestResourceAction>()
                 .SetMoveMode(ActionMoveMode.PerformWhileMoving)
-                .SetStoppingDistance(2f)
+                .SetStoppingDistance(3.5f)
                 .SetTarget<ClosestResourceNodeTarget>()
                 .AddEffect<IsWorking>(EffectType.Increase)
                 .SetProperties(new HarvestResourceAction.Props

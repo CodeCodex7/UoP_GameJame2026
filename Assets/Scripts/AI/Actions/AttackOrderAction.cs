@@ -28,7 +28,7 @@ namespace AI.Goap.UnitAI.Actions
 
         public override void Start(IMonoAgent agent, Data data)
         {
-            data.TargetUnit = GetTargetUnit(data.Target);
+            data.TargetUnit = GetTargetUnit(agent.transform, data.Target);
             data.AttackTimer = null;
             data.HasStartedAttack = false;
         }
@@ -36,7 +36,7 @@ namespace AI.Goap.UnitAI.Actions
         public override bool IsValid(IActionReceiver agent, Data data)
         {
             var attacker = agent.Transform.GetComponent<UnitAIBrain>();
-            var targetUnit = GetTargetUnit(data.Target);
+            var targetUnit = GetTargetUnit(agent.Transform, data.Target);
 
             return attacker != null &&
                    attacker.IsAlive &&
@@ -53,7 +53,7 @@ namespace AI.Goap.UnitAI.Actions
                 return ActionRunState.Stop;
             }
 
-            data.TargetUnit ??= GetTargetUnit(data.Target);
+            data.TargetUnit ??= GetTargetUnit(agent.transform, data.Target);
 
             if (data.TargetUnit == null ||
                 !data.TargetUnit.IsAlive ||
@@ -96,14 +96,21 @@ namespace AI.Goap.UnitAI.Actions
             return ActionRunState.Continue;
         }
 
-        private static IUnit GetTargetUnit(ITarget target)
+        private static IUnit GetTargetUnit(Transform attackerTransform, ITarget target)
         {
-            if (target is not TransformTarget transformTarget || transformTarget.Transform == null)
+            if (target is TransformTarget transformTarget && transformTarget.Transform != null)
             {
-                return null;
+                return transformTarget.Transform.GetComponentInParent<IUnit>();
             }
 
-            return transformTarget.Transform.GetComponentInParent<IUnit>();
+            if (attackerTransform != null &&
+                attackerTransform.TryGetComponent<UnitAIBrain>(out var attacker) &&
+                attacker.TryGetAttackOrderTarget(out var orderedTarget))
+            {
+                return orderedTarget;
+            }
+
+            return null;
         }
     }
 }
