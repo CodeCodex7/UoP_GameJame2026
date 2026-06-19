@@ -12,7 +12,10 @@ public class SpawnableBarracks : SpawnableBuilding
     
     public void OpenMenu()
     {
-        m_menuReference.Initialise(Services.Resolve<SpawnManager>().GetSpawnForType(SpawnableType.Unit), OnMenuUICloseCallback);
+        var spawnInfo = Services.Resolve<SpawnManager>().GetSpawnForType(SpawnableType.Unit);
+        if (spawnInfo.SpawnHandler is UnitSpawnHandler unitSpawnHandler)
+            unitSpawnHandler.SetCurrentBarracks(this);
+        m_menuReference.Initialise(spawnInfo, OnMenuUICloseCallback);
     }
 
     private void OnMenuUICloseCallback()
