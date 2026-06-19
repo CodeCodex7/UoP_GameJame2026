@@ -21,7 +21,7 @@ namespace AI.Goap.UnitAI.Capabilitys
 
             builder.AddAction<DepositResourceAction>()
                 .SetMoveMode(ActionMoveMode.PerformWhileMoving)
-                .SetStoppingDistance(2f)
+                .SetStoppingDistance(3.5f)
                 .SetTarget<ClosestStorageTarget>()
                 .AddCondition<HasCarriedResource>(Comparison.GreaterThan, 0)
                 .AddEffect<HasCarriedResource>(EffectType.Decrease)

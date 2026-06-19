@@ -21,11 +21,6 @@ namespace AI.Goap.UnitAI.Sensors
 
             if (agent.Transform.TryGetComponent<UnitAIBrain>(out var brain))
             {
-                if (brain.TryGetGatherOrderTarget(out var orderedResource))
-                {
-                    return new TransformTarget(orderedResource.Transform);
-                }
-
                 radius = brain.AutoHarvestRadius;
             }
 
@@ -35,7 +30,7 @@ namespace AI.Goap.UnitAI.Sensors
                 return null;
             }
 
-            return new TransformTarget(closestResource.Transform);
+            return InteractionTargetUtility.CreateAroundTarget(agent, closestResource.Transform);
         }
     }
 }

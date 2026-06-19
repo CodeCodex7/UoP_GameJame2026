@@ -24,7 +24,7 @@ namespace DefaultNamespace
                 if (TryGetMouseWorldHit(out var hit))
                 {
                     Debug.Log(hit.point);
-                    unitSelectionController?.SelectedUnit?.HandleContextClick(hit);
+                    unitSelectionController?.HandleContextClickForSelectedUnits(hit);
                 }
             
             }

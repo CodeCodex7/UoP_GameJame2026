@@ -11,10 +11,21 @@ namespace AI.Goap.UnitAI.Behaviors
         void Deselect();
     }
 
-    public interface IUnit : ISelectable
+    public interface IDamage
+    {
+        int MaxHp { get; }
+        int CurrentHp { get; }
+        bool IsAlive { get; }
+
+        void TakeDamage(int amount);
+        void Heal(int amount);
+    }
+
+    public interface IUnit : ISelectable, IDamage
     {
         void MoveOrder(Vector3 targetPosition);
         void GatherOrder(IResource resource);
+        void AttackOrder(IUnit targetUnit);
         void HandleContextClick(RaycastHit hit);
     }
 

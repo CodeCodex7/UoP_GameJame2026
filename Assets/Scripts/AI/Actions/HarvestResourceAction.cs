@@ -90,12 +90,7 @@ namespace AI.Goap.UnitAI.Actions
                 return true;
             }
 
-            if (data.Target is not TransformTarget transformTarget)
-            {
-                return false;
-            }
-
-            var resource = transformTarget.Transform.GetComponentInParent<IResource>();
+            var resource = GetResource(agent, data.Target);
 
             if (resource == null || resource.IsDepleted)
             {
@@ -121,6 +116,28 @@ namespace AI.Goap.UnitAI.Actions
 
             Debug.Log($"Finished harvesting {harvestedResource.amount} {harvestedResource.ResourceName}");
             return true;
+        }
+
+        private static IResource GetResource(IMonoAgent agent, ITarget target)
+        {
+            if (target is TransformTarget transformTarget && transformTarget.Transform != null)
+            {
+                return transformTarget.Transform.GetComponentInParent<IResource>();
+            }
+
+            if (agent.transform.TryGetComponent<UnitAIBrain>(out var brain) &&
+                brain.TryGetGatherOrderTarget(out var orderedResource))
+            {
+                return orderedResource;
+            }
+
+            if (Services.TryResolve<GameDataStore>(out var gameDataStore) &&
+                gameDataStore.TryGetClosestResource(agent.transform.position, 4f, out var closestResource))
+            {
+                return closestResource;
+            }
+
+            return null;
         }
 
         private void NotifyHarvestUnavailable(IMonoAgent agent)
