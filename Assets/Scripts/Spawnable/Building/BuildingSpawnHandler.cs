@@ -7,6 +7,8 @@ using UnityEngine.EventSystems;
 public class BuildingSpawnHandler : BaseSpawnHandler
 {
 
+    public Material GhostMaterial;
+    
     private class SpawnData
     {
         public GameObjectPool<Spawnable> pool;
@@ -49,7 +51,7 @@ public class BuildingSpawnHandler : BaseSpawnHandler
         m_currentSelection = spawnData.pool.GetObject(hitInfo.point);
 
         if (m_currentSelection is SpawnableBuilding building)
-            building.SetGhostMode(true);
+            building.SetGhostMode(true, GhostMaterial);
     }
 
     private void Update()
@@ -93,7 +95,7 @@ public class BuildingSpawnHandler : BaseSpawnHandler
         m_currentSpawnDataForSelection.objects.Add(m_currentSelection);
 
         if (m_currentSelection is SpawnableBuilding building)
-            building.SetGhostMode(false);
+            building.SetGhostMode(false, GhostMaterial);
         m_currentSelection = null;
         m_currentSpawnDataForSelection = null;
         FinalisePlacement();

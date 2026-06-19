@@ -3826,6 +3826,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e62b489a3b9fda94bac04119cdd95d26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingSpawnHandler
+  GhostMaterial: {fileID: 2100000, guid: 941b3c4a3d4250546bcbaa172d286ff8, type: 2}
 --- !u!1001 &1031422060
 PrefabInstance:
   m_ObjectHideFlags: 0

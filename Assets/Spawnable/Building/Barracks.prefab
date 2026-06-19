@@ -366,6 +366,8 @@ MonoBehaviour:
   UIImage: {fileID: 0}
   Description: This building allows you to build more units
   DisplayName: Barracks
+  GhostRenderers:
+  - {fileID: 8451785577382673280}
 --- !u!114 &4297005206477647872
 MonoBehaviour:
   m_ObjectHideFlags: 0
