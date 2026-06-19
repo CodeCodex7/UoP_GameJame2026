@@ -6,4 +6,5 @@ public class Spawnable : MonoBehaviour
     public Texture2D UIImage;
     public string Description;
     public string DisplayName;
+    public MeshRenderer[] GhostRenderers;
 }

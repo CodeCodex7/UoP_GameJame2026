@@ -368,6 +368,8 @@ MonoBehaviour:
   UIImage: {fileID: 0}
   Description: Stores metal
   DisplayName: Metal Storage
+  GhostRenderers:
+  - {fileID: 8451785577382673280}
 --- !u!114 &4163321628041765886
 MonoBehaviour:
   m_ObjectHideFlags: 0
