@@ -19,11 +19,56 @@ public class CostChecker : MonoService<CostChecker>
         m_dataStore = Services.Resolve<GameDataStore>();
     }   
 
-    public bool HasFunds(Spawnable spawnable)
+    public bool HasFunds(ISpawnable spawnable)
     {
+        if (spawnable == null)
+        {
+            return false;
+        }
+
+        if (!TryGetDataStore(out var dataStore))
+        {
+            return false;
+        }
+
         return
-            m_dataStore.GetStoredAmount(ResourceTypes.Metal) >= spawnable.Cost.metal &&
-            m_dataStore.GetStoredAmount(ResourceTypes.Wood) >= spawnable.Cost.wood &&
-            m_dataStore.GetStoredAmount(ResourceTypes.Mushrooms) >= spawnable.Cost.mushrooms;
+            dataStore.GetStoredAmount(ResourceTypes.Metal) >= spawnable.Cost.metal &&
+            dataStore.GetStoredAmount(ResourceTypes.Wood) >= spawnable.Cost.wood &&
+            dataStore.GetStoredAmount(ResourceTypes.Mushrooms) >= spawnable.Cost.mushrooms;
+    }
+
+    public bool TrySpendCost(ISpawnable spawnable)
+    {
+        if (!HasFunds(spawnable) || !TryGetDataStore(out var dataStore))
+        {
+            return false;
+        }
+
+        return TryRemoveIfNeeded(dataStore, ResourceTypes.Metal, spawnable.Cost.metal) &&
+               TryRemoveIfNeeded(dataStore, ResourceTypes.Wood, spawnable.Cost.wood) &&
+               TryRemoveIfNeeded(dataStore, ResourceTypes.Mushrooms, spawnable.Cost.mushrooms);
+    }
+
+    private bool TryGetDataStore(out GameDataStore dataStore)
+    {
+        if (m_dataStore != null)
+        {
+            dataStore = m_dataStore;
+            return true;
+        }
+
+        if (Services.TryResolve<GameDataStore>(out m_dataStore))
+        {
+            dataStore = m_dataStore;
+            return true;
+        }
+
+        dataStore = null;
+        return false;
+    }
+
+    private static bool TryRemoveIfNeeded(GameDataStore dataStore, ResourceTypes resourceType, int amount)
+    {
+        return amount <= 0 || dataStore.TryRemoveStoredResource(resourceType, amount, out _);
     }
 }

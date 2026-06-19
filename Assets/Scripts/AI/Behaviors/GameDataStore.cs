@@ -155,6 +155,47 @@ namespace AI.Goap.UnitAI.Behaviors
             return remainingAmount == 0;
         }
 
+        public int AddStoredResource(ResourceTypes resourceType, int amount)
+        {
+            if (amount <= 0)
+            {
+                return 0;
+            }
+
+            var remainingAmount = amount;
+
+            foreach (var storageBuilding in storageBuildings)
+            {
+                if (storageBuilding == null || remainingAmount <= 0)
+                {
+                    continue;
+                }
+
+                var resourceStack = new ResourceStack(resourceType, remainingAmount);
+
+                if (!storageBuilding.CanAccept(resourceStack))
+                {
+                    continue;
+                }
+
+                if (storageBuilding.Deposit(resourceStack))
+                {
+                    remainingAmount = 0;
+                }
+            }
+
+            return amount - remainingAmount;
+        }
+
+        public int AddStoredResources(int wood, int metal, int mushrooms)
+        {
+            var addedAmount = 0;
+            addedAmount += AddStoredResource(ResourceTypes.Wood, wood);
+            addedAmount += AddStoredResource(ResourceTypes.Metal, metal);
+            addedAmount += AddStoredResource(ResourceTypes.Mushrooms, mushrooms);
+            return addedAmount;
+        }
+
         public bool TryGetClosestResource(Vector3 position, float radius, out IResource closestResource)
         {
             closestResource = null;
@@ -249,6 +290,52 @@ namespace AI.Goap.UnitAI.Behaviors
             foreach (var unit in units)
             {
                 if (unit == null || unit == attacker || !unit.IsAlive || unit.Transform == null)
+                {
+                    continue;
+                }
+
+                if (attackerTeam != null &&
+                    unit is ITeam unitTeam &&
+                    string.Equals(attackerTeam.TeamId, unitTeam.TeamId, System.StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                var distanceSqr = (unit.Transform.position - position).sqrMagnitude;
+
+                if (distanceSqr > closestDistanceSqr)
+                {
+                    continue;
+                }
+
+                closestDistanceSqr = distanceSqr;
+                closestRivalUnit = unit;
+            }
+
+            return closestRivalUnit != null;
+        }
+
+        public bool TryGetClosestRivalUnitOfType(IUnit attacker, UnitType unitType, float radius, out IUnit closestRivalUnit)
+        {
+            closestRivalUnit = null;
+
+            if (attacker == null || attacker.Transform == null)
+            {
+                return false;
+            }
+
+            var attackerTeam = attacker as ITeam;
+            var closestDistanceSqr = radius * radius;
+            var position = attacker.Transform.position;
+
+            foreach (var unit in units)
+            {
+                if (unit == null || unit == attacker || !unit.IsAlive || unit.Transform == null)
+                {
+                    continue;
+                }
+
+                if (unit is not UnitAIBrain unitBrain || unitBrain.Unittype != unitType)
                 {
                     continue;
                 }

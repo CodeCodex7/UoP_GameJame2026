@@ -19,7 +19,7 @@ namespace AI.Goap.UnitAI.Actions
             public ITarget Target { get; set; }
             public IActionRunState AttackTimer { get; set; }
             public bool HasStartedAttack { get; set; }
-            public IUnit TargetUnit { get; set; }
+            public IDamage DamageTarget { get; set; }
         }
 
         public override void Created()
@@ -28,7 +28,7 @@ namespace AI.Goap.UnitAI.Actions
 
         public override void Start(IMonoAgent agent, Data data)
         {
-            data.TargetUnit = GetTargetUnit(agent.transform, data.Target);
+            data.DamageTarget = GetDamageTarget(agent.transform, data.Target);
             data.AttackTimer = null;
             data.HasStartedAttack = false;
         }
@@ -36,14 +36,14 @@ namespace AI.Goap.UnitAI.Actions
         public override bool IsValid(IActionReceiver agent, Data data)
         {
             var attacker = agent.Transform.GetComponent<UnitAIBrain>();
-            var targetUnit = GetTargetUnit(agent.Transform, data.Target);
+            var damageTarget = GetDamageTarget(agent.Transform, data.Target);
 
             return attacker != null &&
                    attacker.IsAlive &&
-                   targetUnit != null &&
-                   targetUnit.IsAlive &&
-                   attacker.IsAttackOrderTarget(targetUnit) &&
-                   attacker.CanAttack(targetUnit);
+                   damageTarget != null &&
+                   damageTarget.IsAlive &&
+                   attacker.IsAttackOrderTarget(damageTarget) &&
+                   attacker.CanAttack(damageTarget);
         }
 
         public override IActionRunState Perform(IMonoAgent agent, Data data, IActionContext context)
@@ -53,18 +53,18 @@ namespace AI.Goap.UnitAI.Actions
                 return ActionRunState.Stop;
             }
 
-            data.TargetUnit ??= GetTargetUnit(agent.transform, data.Target);
+            data.DamageTarget ??= GetDamageTarget(agent.transform, data.Target);
 
-            if (data.TargetUnit == null ||
-                !data.TargetUnit.IsAlive ||
-                !attacker.IsAttackOrderTarget(data.TargetUnit) ||
-                !attacker.CanAttack(data.TargetUnit))
+            if (data.DamageTarget == null ||
+                !data.DamageTarget.IsAlive ||
+                !attacker.IsAttackOrderTarget(data.DamageTarget) ||
+                !attacker.CanAttack(data.DamageTarget))
             {
                 attacker.CompleteAttackOrder();
                 return ActionRunState.Completed;
             }
 
-            if (!context.IsInRange)
+            if (!context.IsInRange || !attacker.IsTargetInAttackRange(data.DamageTarget))
             {
                 data.HasStartedAttack = false;
                 data.AttackTimer = null;
@@ -82,11 +82,22 @@ namespace AI.Goap.UnitAI.Actions
                 return data.AttackTimer;
             }
 
-            data.TargetUnit.TakeDamage(attacker.AttackDamage);
-
-            if (!data.TargetUnit.IsAlive)
+            if (!attacker.IsTargetInAttackRange(data.DamageTarget))
             {
-                Debug.Log($"{attacker.name} defeated {data.TargetUnit.Transform.name}");
+                data.HasStartedAttack = false;
+                data.AttackTimer = null;
+                return ActionRunState.Continue;
+            }
+
+            data.DamageTarget.TakeDamage(attacker.AttackDamage);
+
+            if (!data.DamageTarget.IsAlive)
+            {
+                var targetName = UnitAIBrain.TryGetDamageTransform(data.DamageTarget, out var targetTransform)
+                    ? targetTransform.name
+                    : data.DamageTarget.ToString();
+
+                Debug.Log($"{attacker.name} defeated {targetName}");
                 attacker.CompleteAttackOrder();
                 return ActionRunState.Completed;
             }
@@ -96,11 +107,11 @@ namespace AI.Goap.UnitAI.Actions
             return ActionRunState.Continue;
         }
 
-        private static IUnit GetTargetUnit(Transform attackerTransform, ITarget target)
+        private static IDamage GetDamageTarget(Transform attackerTransform, ITarget target)
         {
             if (target is TransformTarget transformTarget && transformTarget.Transform != null)
             {
-                return transformTarget.Transform.GetComponentInParent<IUnit>();
+                return transformTarget.Transform.GetComponentInParent<IDamage>();
             }
 
             if (attackerTransform != null &&

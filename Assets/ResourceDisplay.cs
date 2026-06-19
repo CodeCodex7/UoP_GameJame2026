@@ -29,7 +29,7 @@ public class ResourceDisplay : MonoBehaviour
         
         GetResourcesAmmounts();
         
-        AmountText.text = $"Wood:{_totalWood}/ Metal{_totalMetal}/ Mushrooms{_totalMushrooms}";
+        AmountText.text = $"Wood: {_totalWood}\nMetal: {_totalMetal}\nMushrooms: {_totalMushrooms}";
     }
 
     private void GetResourcesAmmounts()

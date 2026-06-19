@@ -11,7 +11,7 @@ namespace AI.Goap.UnitAI.Behaviors
     
     
     public enum OrderType{ Move,Action,Wait,Die}
-    public enum UnitType {Worker,Fighter,Civilain,Mayor}
+    public enum UnitType {Worker,Fighter,Civilain,Mayor,EnemyMayor,EnemyMayorGuard}
     [RequireComponent(typeof(GoapActionProvider))]
     [RequireComponent(typeof(UnitInventory))]
     public class UnitAIBrain : MonoBehaviour, IUnit, ITeam
@@ -40,7 +40,10 @@ namespace AI.Goap.UnitAI.Behaviors
         public int CurrentHp => currentHp;
         public bool IsAlive => currentHp > 0;
         public float AttackSearchRadius => attackSearchRadius;
+        public float AttackRange => attackRange;
         public int AttackDamage => attackDamage;
+        public float FleeSearchRadius => fleeSearchRadius;
+        public float FleeDistance => fleeDistance;
 
         [SerializeField] private string teamId = "Player";
         [SerializeField] private GameObject selectionColorTarget;
@@ -53,7 +56,10 @@ namespace AI.Goap.UnitAI.Behaviors
         
         [SerializeField] private UnityEvent onDeath;
         [SerializeField] private float attackSearchRadius = 15f;
+        [SerializeField] private float attackRange = 3.5f;
         [SerializeField] private int attackDamage = 10;
+        [SerializeField] private float fleeSearchRadius = 8f;
+        [SerializeField] private float fleeDistance = 10f;
         [SerializeField] private float autoHarvestIdleDelay = 10f;
         [SerializeField] private float autoHarvestRadius = 12f;
         [SerializeField] private int harvestCarryAmount = 1;
@@ -65,10 +71,14 @@ namespace AI.Goap.UnitAI.Behaviors
         private bool hasRequestedAutoHarvest;
         private bool isDying;
         private IResource gatherOrderTarget;
-        private IUnit attackOrderTarget;
+        private IDamage attackOrderTarget;
 
         public UnitType Unittype;
         public int HarvestCarryAmount => harvestCarryAmount;
+        public bool IsEnemyTeam()
+        {
+            return string.Equals(TeamId, "Enemy", StringComparison.Ordinal);
+        }
         
         private void Awake()
         {
@@ -98,9 +108,21 @@ namespace AI.Goap.UnitAI.Behaviors
                 }
                     break;
 
+                case UnitType.EnemyMayorGuard:
+                {
+                    CreateAgent("EnemyMayorGuard");
+                }
+                    break;
+
                 case UnitType.Mayor:
                 {
                     CreateAgent("Mayor");
+                }
+                    break;
+
+                case UnitType.EnemyMayor:
+                {
+                    CreateAgent("EnemyMayor");
                 }
                     break;
                 
@@ -159,13 +181,32 @@ namespace AI.Goap.UnitAI.Behaviors
                 
                 case UnitType.Fighter:
                 {
-                    provider.RequestGoal<AttackRivalUnitGoal>(true);
+                    if (IsEnemyTeam())
+                    {
+                        HuntPlayerMayor();
+                    }
+                    else
+                    {
+                        provider.RequestGoal<AttackRivalUnitGoal>(true);
+                    }
+                }
+                    break;
+
+                case UnitType.EnemyMayorGuard:
+                {
+                    provider.RequestGoal<IdleGoal>(true);
                 }
                     break;
 
                 case UnitType.Mayor:
                 {
                     provider.RequestGoal<IdleGoal>(true);
+                }
+                    break;
+
+                case UnitType.EnemyMayor:
+                {
+                    provider.RequestGoal<FleeGoal>(true);
                 }
                     break;
                 
@@ -258,15 +299,15 @@ namespace AI.Goap.UnitAI.Behaviors
             return Unittype == UnitType.Worker || Unittype == UnitType.Mayor;
         }
 
-        public void AttackOrder(IUnit targetUnit)
+        public void AttackOrder(IDamage target)
         {
-            if (!CanAttack(targetUnit))
+            if (!CanAttack(target))
             {
                 return;
             }
 
             ClearGatherOrder();
-            attackOrderTarget = targetUnit;
+            attackOrderTarget = target;
             IssueOrder();
 
             var receiver = provider.Receiver;
@@ -283,6 +324,19 @@ namespace AI.Goap.UnitAI.Behaviors
             {
                 provider.ResolveAction();
             }
+        }
+
+        public void HuntPlayerMayor()
+        {
+            if (provider == null || !IsAlive || !IsEnemyTeam())
+            {
+                return;
+            }
+
+            ClearGatherOrder();
+            ClearAttackOrder();
+            IssueOrder();
+            provider.RequestGoal<AttackPlayerMayorGoal>(true);
         }
 
         private void SetMoveOrderTarget(Vector3 targetPosition, bool interruptCurrentAction)
@@ -345,6 +399,14 @@ namespace AI.Goap.UnitAI.Behaviors
                 return;
             }
 
+            var damageTarget = hit.collider.GetComponentInParent<IDamage>();
+
+            if (CanAttack(damageTarget))
+            {
+                AttackOrder(damageTarget);
+                return;
+            }
+
             var actionTarget = hit.collider.GetComponentInParent<IUnitActionTarget>();
 
             if (actionTarget != null && actionTarget.TryIssueOrder(this, hit))
@@ -355,21 +417,64 @@ namespace AI.Goap.UnitAI.Behaviors
             MoveOrder(hit.point);
         }
 
-        public bool CanAttack(IUnit targetUnit)
+        public UnitCursorType GetContextCursor(RaycastHit hit)
         {
-            if (targetUnit == null || ReferenceEquals(targetUnit, this) || !IsAlive || !targetUnit.IsAlive)
+            var clickedUnit = hit.collider.GetComponentInParent<IUnit>();
+
+            if (CanAttack(clickedUnit))
+            {
+                return UnitCursorType.Attack;
+            }
+
+            var damageTarget = hit.collider.GetComponentInParent<IDamage>();
+
+            if (CanAttack(damageTarget))
+            {
+                return UnitCursorType.Attack;
+            }
+
+            var resource = hit.collider.GetComponentInParent<IResource>();
+
+            if (resource != null && !resource.IsDepleted)
+            {
+                return CanGatherResources() ? UnitCursorType.Harvest : UnitCursorType.Blocked;
+            }
+
+            var actionTarget = hit.collider.GetComponentInParent<IUnitActionTarget>();
+
+            if (actionTarget != null)
+            {
+                return UnitCursorType.Interact;
+            }
+
+            return UnitCursorType.Move;
+        }
+
+        public bool CanAttack(IDamage target)
+        {
+            if (target == null || ReferenceEquals(target, this) || !IsAlive || !target.IsAlive)
             {
                 return false;
             }
 
             if (this is ITeam attackerTeam &&
-                targetUnit is ITeam targetTeam &&
+                target is ITeam targetTeam &&
                 string.Equals(attackerTeam.TeamId, targetTeam.TeamId, StringComparison.Ordinal))
             {
                 return false;
             }
 
             return true;
+        }
+
+        public bool IsTargetInAttackRange(IDamage target)
+        {
+            if (!CanAttack(target) || !TryGetDamageTransform(target, out var targetTransform))
+            {
+                return false;
+            }
+
+            return Vector3.Distance(transform.position, targetTransform.position) <= attackRange;
         }
 
         public void TakeDamage(int amount)
@@ -512,28 +617,28 @@ namespace AI.Goap.UnitAI.Behaviors
             gatherOrderTarget = null;
         }
 
-        public bool TryGetAttackOrderTarget(out IUnit targetUnit)
+        public bool TryGetAttackOrderTarget(out IDamage target)
         {
-            targetUnit = null;
+            target = null;
 
             if (attackOrderTarget == null)
             {
                 return false;
             }
 
-            if (!attackOrderTarget.IsAlive || attackOrderTarget.Transform == null)
+            if (!attackOrderTarget.IsAlive || !TryGetDamageTransform(attackOrderTarget, out _))
             {
                 CompleteAttackOrder();
                 return false;
             }
 
-            targetUnit = attackOrderTarget;
+            target = attackOrderTarget;
             return true;
         }
 
-        public bool IsAttackOrderTarget(IUnit targetUnit)
+        public bool IsAttackOrderTarget(IDamage target)
         {
-            return targetUnit != null && attackOrderTarget == targetUnit;
+            return target != null && attackOrderTarget == target;
         }
 
         public void CompleteAttackOrder()
@@ -546,6 +651,30 @@ namespace AI.Goap.UnitAI.Behaviors
         public void ClearAttackOrder()
         {
             attackOrderTarget = null;
+        }
+
+        public static bool TryGetDamageTransform(IDamage target, out Transform targetTransform)
+        {
+            targetTransform = null;
+
+            if (target == null)
+            {
+                return false;
+            }
+
+            if (target is ISelectable selectable && selectable.Transform != null)
+            {
+                targetTransform = selectable.Transform;
+                return true;
+            }
+
+            if (target is Component component && component != null)
+            {
+                targetTransform = component.transform;
+                return true;
+            }
+
+            return false;
         }
 
         public bool AddCarriedResource(ResourceStack resourceStack)

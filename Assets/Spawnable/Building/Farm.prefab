@@ -360,9 +360,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpawnableBuilding
   Cost:
-    metal: 10
-    wood: 11
-    mushrooms: 12
+    metal: 0
+    wood: 10
+    mushrooms: 0
   UIImage: {fileID: 0}
   Description: This building grows mushrooms
   DisplayName: Mushroom Farm

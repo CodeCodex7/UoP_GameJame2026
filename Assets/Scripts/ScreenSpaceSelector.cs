@@ -5,7 +5,11 @@ namespace DefaultNamespace
 {
     public class ScreenSpaceSelector : MonoBehaviour
     {
+        [SerializeField] private float rightClickDragThreshold = 8f;
+
         public UnitSelectionController unitSelectionController;
+
+        private Vector2 rightClickStartPosition;
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
@@ -19,8 +23,18 @@ namespace DefaultNamespace
         // Update is called once per frame
         void Update()
         {
-            if (Input.GetMouseButtonDown(1)) // Right mouse button
+            if (Input.GetMouseButtonDown(1))
             {
+                rightClickStartPosition = Input.mousePosition;
+            }
+
+            if (Input.GetMouseButtonUp(1))
+            {
+                if (Vector2.Distance(rightClickStartPosition, Input.mousePosition) >= rightClickDragThreshold)
+                {
+                    return;
+                }
+
                 if (TryGetMouseWorldHit(out var hit))
                 {
                     Debug.Log(hit.point);

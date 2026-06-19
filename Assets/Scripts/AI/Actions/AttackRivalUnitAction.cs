@@ -59,7 +59,7 @@ namespace AI.Goap.UnitAI.Actions
                 return ActionRunState.Completed;
             }
 
-            if (!context.IsInRange)
+            if (!context.IsInRange || !attacker.IsTargetInAttackRange(data.TargetUnit))
             {
                 data.HasStartedAttack = false;
                 data.AttackTimer = null;
@@ -75,6 +75,13 @@ namespace AI.Goap.UnitAI.Actions
             if (data.AttackTimer.IsRunning())
             {
                 return data.AttackTimer;
+            }
+
+            if (!attacker.IsTargetInAttackRange(data.TargetUnit))
+            {
+                data.HasStartedAttack = false;
+                data.AttackTimer = null;
+                return ActionRunState.Continue;
             }
 
             data.TargetUnit.TakeDamage(attacker.AttackDamage);

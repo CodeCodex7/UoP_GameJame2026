@@ -17,12 +17,14 @@ namespace AI.Goap.UnitAI.Sensors
         public override ITarget Sense(IActionReceiver agent, IComponentReference references, ITarget existingTarget)
         {
             if (!agent.Transform.TryGetComponent<UnitAIBrain>(out var brain) ||
-                !brain.TryGetAttackOrderTarget(out var targetUnit))
+                !brain.TryGetAttackOrderTarget(out var target))
             {
                 return null;
             }
 
-            return InteractionTargetUtility.CreateAroundTarget(agent, targetUnit.Transform);
+            return UnitAIBrain.TryGetDamageTransform(target, out var targetTransform)
+                ? new TransformTarget(targetTransform)
+                : null;
         }
     }
 }

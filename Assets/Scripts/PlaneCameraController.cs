@@ -9,11 +9,15 @@ public class PlaneCameraController : MonoBehaviour
     [SerializeField] private float zoomSpeed = 30f;
     [SerializeField] private float minZoomHeight = 6f;
     [SerializeField] private float maxZoomHeight = 40f;
+    [SerializeField] private bool enableRightClickDrag = true;
+    [SerializeField] private float dragPlaneHeight = 0f;
     [SerializeField] private bool useBounds = true;
     [SerializeField] private Vector2 xBounds = new Vector2(-50f, 50f);
     [SerializeField] private Vector2 zBounds = new Vector2(-50f, 50f);
 
     private float targetYaw;
+    private Vector3 dragAnchorWorldPosition;
+    private bool isRightDraggingCamera;
 
     private void Awake()
     {
@@ -22,6 +26,7 @@ public class PlaneCameraController : MonoBehaviour
 
     private void Update()
     {
+        HandleRightClickDrag();
         HandleMovement();
         HandleZoom();
         HandleRotationInput();
@@ -53,6 +58,40 @@ public class PlaneCameraController : MonoBehaviour
             : 1f;
 
         var movement = (right * input.x + forward * input.z) * moveSpeed * speedMultiplier * Time.deltaTime;
+        transform.position += movement;
+    }
+
+    private void HandleRightClickDrag()
+    {
+        if (!enableRightClickDrag)
+        {
+            return;
+        }
+
+        if (Input.GetMouseButtonDown(1))
+        {
+            isRightDraggingCamera = TryGetMousePointOnDragPlane(out dragAnchorWorldPosition);
+            return;
+        }
+
+        if (Input.GetMouseButtonUp(1))
+        {
+            isRightDraggingCamera = false;
+            return;
+        }
+
+        if (!isRightDraggingCamera || !Input.GetMouseButton(1))
+        {
+            return;
+        }
+
+        if (!TryGetMousePointOnDragPlane(out var currentWorldPosition))
+        {
+            return;
+        }
+
+        var movement = dragAnchorWorldPosition - currentWorldPosition;
+        movement.y = 0f;
         transform.position += movement;
     }
 
@@ -102,5 +141,22 @@ public class PlaneCameraController : MonoBehaviour
         var currentRotation = transform.rotation;
         var targetRotation = Quaternion.Euler(transform.eulerAngles.x, targetYaw, transform.eulerAngles.z);
         transform.rotation = Quaternion.RotateTowards(currentRotation, targetRotation, rotationSpeed * Time.deltaTime);
+    }
+
+    private bool TryGetMousePointOnDragPlane(out Vector3 point)
+    {
+        var dragPlane = new Plane(Vector3.up, new Vector3(0f, dragPlaneHeight, 0f));
+        var ray = Camera.main != null
+            ? Camera.main.ScreenPointToRay(Input.mousePosition)
+            : new Ray(transform.position, transform.forward);
+
+        if (dragPlane.Raycast(ray, out var enter))
+        {
+            point = ray.GetPoint(enter);
+            return true;
+        }
+
+        point = default;
+        return false;
     }
 }

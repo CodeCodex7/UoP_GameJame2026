@@ -2,6 +2,16 @@ using UnityEngine;
 
 namespace AI.Goap.UnitAI.Behaviors
 {
+    public enum UnitCursorType
+    {
+        Default,
+        Move,
+        Harvest,
+        Attack,
+        Interact,
+        Blocked
+    }
+
     public interface ISelectable
     {
         Transform Transform { get; }
@@ -25,8 +35,9 @@ namespace AI.Goap.UnitAI.Behaviors
     {
         void MoveOrder(Vector3 targetPosition);
         void GatherOrder(IResource resource);
-        void AttackOrder(IUnit targetUnit);
+        void AttackOrder(IDamage target);
         void HandleContextClick(RaycastHit hit);
+        UnitCursorType GetContextCursor(RaycastHit hit);
     }
 
     public interface IUnitActionTarget

@@ -7,10 +7,14 @@ namespace DefaultNamespace
     public class ResourceNode : MonoBehaviour ,IResource ,IUnitActionTarget
     {
         [SerializeField] private ResourcesBase resource = new ResourcesBase();
+        [SerializeField] private int minAmount =  5;
+        [SerializeField] private int maxAmount = 100;
         [SerializeField] private int amountRemaining = 100;
         [SerializeField] private UnityEvent onDepleted;
         [SerializeField] private bool deleteOnDepleted;
 
+        
+        
         private bool hasHandledDepletion;
 
         public Transform Transform => transform;
@@ -19,6 +23,17 @@ namespace DefaultNamespace
         public string ResourceId => resource.Name;
         public int AmountRemaining => amountRemaining;
         public bool IsDepleted => amountRemaining <= 0;
+
+        private void Awake()
+        {
+            RandomiseAmount();
+        }
+
+        private void OnValidate()
+        {
+            minAmount = Mathf.Max(0, minAmount);
+            maxAmount = Mathf.Max(minAmount, maxAmount);
+        }
 
         private void OnEnable()
         {
@@ -50,6 +65,12 @@ namespace DefaultNamespace
         {
             unit.GatherOrder(this);
             return true;
+        }
+
+        public void RandomiseAmount()
+        {
+            amountRemaining = Random.Range(minAmount, maxAmount + 1);
+            hasHandledDepletion = amountRemaining <= 0;
         }
 
         public bool TryHarvest(int requestedAmount, out ResourceStack harvestedResource)

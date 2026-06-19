@@ -15,15 +15,16 @@ public abstract class BaseSpawnHandler : MonoBehaviour
         m_costChecker = Services.Resolve<CostChecker>();
     }
 
-    public void InitiateSpawnInteraction(Spawnable spawnable, Action onSpawnHandlerComplete)
+    public bool InitiateSpawnInteraction(Spawnable spawnable, Action onSpawnHandlerComplete)
     {
         if (!m_costChecker.HasFunds(spawnable))
-            return;
+            return false;
         
         m_handlerCompleteCallback = onSpawnHandlerComplete;
         m_currentSpawnable = spawnable;
         
         StartPlacement(spawnable);
+        return true;
     }
 
 
@@ -33,8 +34,10 @@ public abstract class BaseSpawnHandler : MonoBehaviour
 
     protected virtual void FinalisePlacement()
     {
+        var handlerCompleteCallback = m_handlerCompleteCallback;
+
         m_currentSpawnable = null;
         m_handlerCompleteCallback = null;
-        m_handlerCompleteCallback?.Invoke();
+        handlerCompleteCallback?.Invoke();
     }
 }

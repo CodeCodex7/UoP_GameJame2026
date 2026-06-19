@@ -20,6 +20,7 @@ GameObject:
   - component: {fileID: 4222185179540666160}
   - component: {fileID: 1766014342347036745}
   - component: {fileID: 8938642404856729198}
+  - component: {fileID: 1360788307109951856}
   m_Layer: 0
   m_Name: PlayerWorkerUnit
   m_TagString: Untagged
@@ -142,9 +143,12 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   attackSearchRadius: 15
+  attackRange: 3.5
   attackDamage: 15
+  fleeSearchRadius: 8
+  fleeDistance: 10
   autoHarvestIdleDelay: 5
-  autoHarvestRadius: 12
+  autoHarvestRadius: 20
   harvestCarryAmount: 1
   inventory: {fileID: 0}
   Unittype: 0
@@ -286,6 +290,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: AI.Goap.IdleMan::AI.Goap.UnitAI.Behaviors.UnitInventory
   maxTotalAmount: 0
   resources: []
+--- !u!114 &1360788307109951856
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6832823568451728069}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c2ae04431da367439d1b770fcc09133, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpawnableUnit
+  Cost:
+    metal: 0
+    wood: 0
+    mushrooms: 5
+  UIImage: {fileID: 0}
+  Description: A worker
+  DisplayName: Worker
+  GhostRenderers: []
+  unitBrain: {fileID: 4375776199173459415}
 --- !u!1001 &3098412383180261729
 PrefabInstance:
   m_ObjectHideFlags: 0

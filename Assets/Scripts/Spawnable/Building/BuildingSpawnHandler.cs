@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -60,11 +59,16 @@ public class BuildingSpawnHandler : BaseSpawnHandler
         if (m_currentSpawnable == null)
             return;
 
+        if (Input.GetMouseButtonDown(1))
+        {
+            FinaliseWithoutPlace();
+            return;
+        }
+
         if (Camera.main == null)
             return;
 
         bool rayHit = GetWorldCoordinatesOfObject(out var hitInfo);
-        Debug.Log($"{Input.mousePosition}, {Input.GetMouseButton(0)}, {rayHit}, {hitInfo.point}");
         if (!rayHit)
         {
             Debug.LogError("Failed to translate current screen position to world position. Giving up");
@@ -74,9 +78,9 @@ public class BuildingSpawnHandler : BaseSpawnHandler
 
         m_currentSelection.transform.position = hitInfo.point;
 
-        if (Input.GetMouseButtonUp(0))
+        if (Input.GetMouseButtonDown(0))
         {
-            if (EventSystem.current.IsPointerOverGameObject())
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
             {
                 return;
             }
@@ -93,6 +97,20 @@ public class BuildingSpawnHandler : BaseSpawnHandler
 
     private void FinaliseAndPlace()
     {
+        if (!Services.TryResolve<CostChecker>(out var costChecker))
+        {
+            Debug.LogWarning($"Could not place {m_currentSpawnable.DisplayName}. CostChecker service is not registered.");
+            FinaliseWithoutPlace();
+            return;
+        }
+
+        if (!costChecker.TrySpendCost(m_currentSpawnable))
+        {
+            Debug.LogWarning($"Could not place {m_currentSpawnable.DisplayName}. Not enough resources.");
+            FinaliseWithoutPlace();
+            return;
+        }
+
         m_currentSpawnDataForSelection.objects.Add(m_currentSelection);
 
         if (m_currentSelection is SpawnableBuilding building)
@@ -104,7 +122,12 @@ public class BuildingSpawnHandler : BaseSpawnHandler
 
     private void FinaliseWithoutPlace()
     {
-        m_currentSpawnDataForSelection?.pool.ReleaseObject(m_currentSelection.gameObject);
+        if (m_currentSelection is SpawnableBuilding building)
+            building.SetGhostMode(false, GhostMaterial);
+
+        if (m_currentSelection != null)
+            m_currentSpawnDataForSelection?.pool.ReleaseObject(m_currentSelection.gameObject);
+
         m_currentSelection = null;
         m_currentSpawnDataForSelection = null;
         FinalisePlacement();

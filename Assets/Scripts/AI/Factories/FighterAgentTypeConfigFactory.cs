@@ -13,6 +13,7 @@ namespace AI.Goap.UnitAI.Factories
             builder.AddCapability<IdleCapability>();
             builder.AddCapability<MoveOrderCapability>();
             builder.AddCapability<AttackOrderCapability>();
+            builder.AddCapability<AttackPlayerMayorCapability>();
             builder.AddCapability<AttackRivalUnitCapability>();
 
             return builder.Build();

@@ -34,7 +34,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0.919}
+  m_AnchoredPosition: {x: 0, y: 1.143}
   m_SizeDelta: {x: 20, y: 5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &4159572428648339068
@@ -362,9 +362,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpawnableBuilding
   Cost:
-    metal: 13
-    wood: 14
-    mushrooms: 15
+    metal: 0
+    wood: 10
+    mushrooms: 0
   UIImage: {fileID: 0}
   Description: Stores metal
   DisplayName: Metal Storage
@@ -470,7 +470,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6f6a06cba5891d445a0ac9f6227bc50a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.088
+      value: 0.232
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6f6a06cba5891d445a0ac9f6227bc50a, type: 3}
       propertyPath: m_LocalPosition.z

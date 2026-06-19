@@ -23,6 +23,7 @@ public class BuildingMenuUI : MonoService<BuildingMenuUI>
 
     private GameObjectPool<SpawnableObjectMenuEntry> m_menuEntryPool;
     private bool m_menuIsOpen;
+    private int m_ignoreRightClickCloseFrame = -1;
     
     private void Awake()
     {
@@ -37,6 +38,26 @@ public class BuildingMenuUI : MonoService<BuildingMenuUI>
         UnregisterService();
     }
 
+    private void Update()
+    {
+        if (!m_menuIsOpen || m_hasItemSelected || !Input.GetMouseButtonDown(1))
+        {
+            return;
+        }
+
+        if (m_ignoreRightClickCloseFrame == Time.frameCount)
+        {
+            return;
+        }
+
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+        {
+            return;
+        }
+
+        CloseMenu();
+    }
+
     public void Initialise(SpawnInfo spawnInfo, Action closeCallback)
     {
         if (m_menuIsOpen)
@@ -45,6 +66,8 @@ public class BuildingMenuUI : MonoService<BuildingMenuUI>
         m_menuIsOpen = true;
         m_closeCallback = closeCallback;
         m_spawnInfo = spawnInfo;
+        m_currentHover = null;
+        m_hasItemSelected = false;
         m_entries = spawnInfo.Catalogue.Select(x =>
         {
             var ret = m_menuEntryPool.GetObject(Vector3.zero);
@@ -64,6 +87,8 @@ public class BuildingMenuUI : MonoService<BuildingMenuUI>
         m_spawnMenuUI.gameObject.SetActive(false);
         m_closeCallback?.Invoke();
         m_closeCallback = null;
+        m_currentHover = null;
+        m_hasItemSelected = false;
         m_menuIsOpen = false;
     }
 
@@ -105,12 +130,22 @@ public class BuildingMenuUI : MonoService<BuildingMenuUI>
         Debug.Log($"Selected {spawnableObjectMenuEntry.GetHashCode()}");
         m_hasItemSelected = true;
         
-        m_spawnInfo.SpawnHandler.InitiateSpawnInteraction(spawnableObjectMenuEntry.Spawnable, OnSpawnHandlerComplete);
+        if (!m_spawnInfo.SpawnHandler.InitiateSpawnInteraction(spawnableObjectMenuEntry.Spawnable, OnSpawnHandlerComplete))
+        {
+            m_hasItemSelected = false;
+            SetupDetailView(m_currentHover);
+        }
     }
 
     private void OnSpawnHandlerComplete()
     {
         m_hasItemSelected = false;
+
+        if (Input.GetMouseButtonDown(1))
+        {
+            m_ignoreRightClickCloseFrame = Time.frameCount;
+        }
+
         if (m_currentHover != null)
             SetupDetailView(m_currentHover);
     }
