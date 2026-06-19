@@ -164,8 +164,13 @@ GameObject:
   - component: {fileID: 51392295}
   - component: {fileID: 51392294}
   - component: {fileID: 51392293}
+<<<<<<< HEAD
   m_Layer: 6
   m_Name: Plane
+=======
+  m_Layer: 0
+  m_Name: Ground
+>>>>>>> origin/feature/CombatAI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -265,6 +270,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+<<<<<<< HEAD
 --- !u!1001 &53018313
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -571,6 +577,9 @@ RectTransform:
   m_PrefabInstance: {fileID: 807470420235444476}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &181883429
+=======
+--- !u!1 &69218148
+>>>>>>> origin/feature/CombatAI
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2614,6 +2623,7 @@ MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
+<<<<<<< HEAD
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &367842293
 GameObject:
@@ -2834,7 +2844,52 @@ CanvasRenderer:
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 5daff305aee051c4b941a5e5f5b85f77, type: 3}
   m_PrefabInstance: {fileID: 1410163469}
+=======
+>>>>>>> origin/feature/CombatAI
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 497213310}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &625999064
 GameObject:
   m_ObjectHideFlags: 0
@@ -2932,7 +2987,11 @@ RectTransform:
   - {fileID: 1414724708}
   - {fileID: 1152945994}
   - {fileID: 300295772}
+<<<<<<< HEAD
   - {fileID: 140557175}
+=======
+  - {fileID: 1176166871}
+>>>>>>> origin/feature/CombatAI
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -4646,6 +4705,7 @@ MonoBehaviour:
   screens:
   - key: Building
     screen: {fileID: 300295771}
+<<<<<<< HEAD
 --- !u!114 &1239944561 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7388043570580910804, guid: 56afd6e26dcc07342893c7af3b5ae91b, type: 3}
@@ -4659,6 +4719,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RawImage
 --- !u!1001 &1243462206
 PrefabInstance:
+=======
+--- !u!1 &1242622964
+GameObject:
+>>>>>>> origin/feature/CombatAI
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -4871,6 +4935,7 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+<<<<<<< HEAD
 --- !u!4 &1287807964 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 5daff305aee051c4b941a5e5f5b85f77, type: 3}
@@ -4949,6 +5014,9 @@ CanvasRenderer:
   m_GameObject: {fileID: 1332784964}
   m_CullTransparentMesh: 1
 --- !u!1001 &1405118004
+=======
+--- !u!1001 &1325483146
+>>>>>>> origin/feature/CombatAI
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -5488,6 +5556,7 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+<<<<<<< HEAD
 --- !u!114 &1558353385
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5515,6 +5584,9 @@ MonoBehaviour:
     SpawnHandler: {fileID: 367842295}
     ObjectParent: {fileID: 367842293}
 --- !u!4 &1558353386
+=======
+--- !u!4 &1517453980
+>>>>>>> origin/feature/CombatAI
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5526,10 +5598,15 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
+<<<<<<< HEAD
   m_Children:
   - {fileID: 991756550}
   - {fileID: 367842294}
   m_Father: {fileID: 0}
+=======
+  m_Children: []
+  m_Father: {fileID: 412220450}
+>>>>>>> origin/feature/CombatAI
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1517453981
 MonoBehaviour:
