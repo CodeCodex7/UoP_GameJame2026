@@ -1,5 +1,6 @@
 ﻿using AI.Goap.UnitAI.Behaviors;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace DefaultNamespace
 {
@@ -7,6 +8,10 @@ namespace DefaultNamespace
     {
         [SerializeField] private ResourcesBase resource = new ResourcesBase();
         [SerializeField] private int amountRemaining = 100;
+        [SerializeField] private UnityEvent onDepleted;
+        [SerializeField] private bool deleteOnDepleted;
+
+        private bool hasHandledDepletion;
 
         public Transform Transform => transform;
         public ResourcesBase Resource => resource;
@@ -59,7 +64,29 @@ namespace DefaultNamespace
             var harvestedAmount = Mathf.Min(requestedAmount, amountRemaining);
             amountRemaining -= harvestedAmount;
             harvestedResource = new ResourceStack(resource.ResourceType, harvestedAmount);
+
+            if (IsDepleted)
+            {
+                HandleDepleted();
+            }
+
             return harvestedAmount > 0;
+        }
+
+        private void HandleDepleted()
+        {
+            if (hasHandledDepletion)
+            {
+                return;
+            }
+
+            hasHandledDepletion = true;
+            onDepleted?.Invoke();
+
+            if (deleteOnDepleted)
+            {
+                Destroy(gameObject);
+            }
         }
     }
 }

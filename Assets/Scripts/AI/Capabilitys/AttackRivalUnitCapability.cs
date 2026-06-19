@@ -21,7 +21,7 @@ namespace AI.Goap.UnitAI.Capabilitys
 
             builder.AddAction<AttackRivalUnitAction>()
                 .SetMoveMode(ActionMoveMode.PerformWhileMoving)
-                .SetStoppingDistance(2f)
+                .SetStoppingDistance(3.5f)
                 .SetTarget<ClosestRivalUnitTarget>()
                 .AddCondition<HasRivalUnit>(Comparison.GreaterThan, 0)
                 .AddEffect<HasRivalUnit>(EffectType.Decrease)

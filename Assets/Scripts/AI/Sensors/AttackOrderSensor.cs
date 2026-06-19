@@ -22,7 +22,7 @@ namespace AI.Goap.UnitAI.Sensors
                 return null;
             }
 
-            return new TransformTarget(targetUnit.Transform);
+            return InteractionTargetUtility.CreateAroundTarget(agent, targetUnit.Transform);
         }
     }
 }

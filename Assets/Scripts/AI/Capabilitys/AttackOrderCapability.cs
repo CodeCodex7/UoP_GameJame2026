@@ -21,7 +21,7 @@ namespace AI.Goap.UnitAI.Capabilitys
 
             builder.AddAction<AttackOrderAction>()
                 .SetMoveMode(ActionMoveMode.PerformWhileMoving)
-                .SetStoppingDistance(2f)
+                .SetStoppingDistance(3.5f)
                 .SetTarget<AttackOrderTarget>()
                 .AddCondition<HasAttackOrder>(Comparison.GreaterThan, 0)
                 .AddEffect<HasAttackOrder>(EffectType.Decrease)
